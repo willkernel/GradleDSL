@@ -1,2 +1,1 @@
-# GradleDSL
-Gradle practice for Android
+Gradle practice for Android app

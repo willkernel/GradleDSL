@@ -1,0 +1,275 @@
+apply plugin: "com.android.application"
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
+
+    defaultConfig {
+        applicationId "com.willkernel.app.gradledsl"
+        minSdkVersion 19
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0.0"
+        multiDexEnabled true
+        // get the git hash in your Java code with BuildConfig.GitHash.
+//        buildConfigField "String", "GitHash", "\"${getGitHash()}\""
+
+        //Rename the output apk
+//        applicationVariants.all { variant ->
+//            variant.outputs.each { output ->
+//                def formattedDate = new Date().format('yyyyMMddHHmmss')
+//                def file = output.packageApplication.outputFile
+//                def fileName = file.name.replace("app", "willkernel") + formattedDate
+////                + rootProject.GitHash
+//                output.packageApplication.outputFile = new File(file.parent, fileName)
+//            }
+//        }
+    }
+
+    signingConfigs {
+        release {
+//            Generating a release key , keytool -help 获取帮助
+//            keytool -genkey -v -keystore app.keystore/app.jks -alias gradle -keyalg RSA -keysize 2048 -validity 10000 (all on one line)
+//            正在为以下对象生成 2,048 位RSA密钥对和自签名证书 (SHA256withRSA) (有效期为 20,000 天)
+            keyAlias project.keyAlias
+
+            //通过命令行设置see config.gradle
+            //或者通过环境变量获取这些密码 System.getenv("KEYPWD")
+            //或者构建流程在您要从命令行调用此构建时提示您输入这些密码
+            //System.console().readLine("\nKey password: ")
+            keyPassword project.keyPassword
+
+            storeFile file('../' + project.storeFile)
+
+            //System.getenv("KSTOREPWD")
+            //System.console().readLine("\nKeystore password: ")
+            storePassword project.storePassword
+        }
+
+        debug {
+//        shows how to list the default certificate
+//        c:\Users\willkernel\.android> keytool -list -keystore debug.keystore
+
+//        The keystore type is JKS, which stands for (naturally enough) Java KeyStore, used
+//        for public and private keys. Java supports another type called JCEKS (Java Cryptography
+//        Extensions KeyStore), which can be used for shared keys, but isn’t used for
+//        Android applications.
+//        The keystore has a self-signed certificate with an alias of androiddebugkey, which is
+//        used to sign debug APKs when they are deployed to connected devices or emulators.
+//                To reset the debug keystore, simply delete the file debug.keystore. It
+//        will be re-created next time you deploy an app.
+        }
+    }
+
+//    http://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.BuildType.html
+    buildTypes {
+        debug {
+
+        }
+
+//      sign release apk by running gradlew assembleRelease
+        release {
+            //Properties
+            applicationIdSuffix '.release'
+            //Application id suffix. It is appended to the "base" application
+            // id when calculating the final application id for a variant.
+
+//          Version name suffix. It is appended to the "base" version name
+//          when calculating the final version name for a variant.
+            versionNameSuffix '-release'
+
+            minifyEnabled true  //Whether removal of unused java code is enabled.
+            zipAlignEnabled true  //Whether zipalign is enabled for this build type.
+            crunchPngs true     //Whether to crunch PNGs.
+            multiDexEnabled     //Whether Multi-Dex is enabled for this variant.
+//            multiDexKeepFile : Text file that specifies additional classes that will be compiled into the main dex file.
+//            multiDexKeepProguard : Text file with additional ProGuard rules to be used to determine which classes are compiled into the main dex file.
+
+            //Whether shrinking of unused resources is enabled. Default is false
+            shrinkResources true
+
+            //Whether this build type should generate a debuggable apk.
+            debuggable false
+
+            useProguard true
+//            Specifies whether to always use ProGuard for code and resource shrinking
+
+//            Optimization level to use by the renderscript compiler.
+//            renderscriptOptimLevel
+
+//            Whether the build type is configured to generate an apk with debuggable RenderScript code.
+//            renderscriptDebuggable
+
+            signingConfig signingConfigs.release
+
+            //Methods
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        /**
+         * The 'initWith' property allows you to copy configurations from other build types,
+         * so you don't have to configure one from the beginning. You can then configure
+         * just the settings you want to change. The following line initializes
+         * 'jnidebug' using the debug build type, and changes only the
+         * applicationIdSuffix and versionNameSuffix settings.
+         */
+
+        jnidebug {
+
+            // This copies the debuggable attribute and debug signing configurations.
+            initWith debug
+
+            applicationIdSuffix ".jnidebug"
+            jniDebuggable true
+        }
+
+    }
+
+    // Specifies the flavor dimensions you want to use. The order in which you
+    // list each dimension determines its priority, from highest to lowest,
+    // when Gradle merges variant sources and configurations. You must assign
+    // each product flavor you configure to one of the flavor dimensions.
+    flavorDimensions "mode", "client", "api"
+//    One additional note is necessary here. The flavorDimensions tag in the Gradle build
+//    file listed attitude before client, which means values from the attitude dimension
+//    will have higher priority than the client dimension. Therefore, the hello_world
+//    string resource was removed from each of the attitude flavors. Switching the order of
+//    client and attitude would have worked just as well, of course
+
+// The priority is: build type overrides Product Flavor,
+// which overrides the main source set.
+    productFlavors {
+        free {
+            applicationId "com.willkernel.app.gradledsl.free"
+//            applicationIdSuffix '.free'
+            versionNameSuffix '-free'
+            dimension "mode"
+        }
+
+        paid {
+            applicationId "com.willkernel.app.gradledsl.paid"
+//            applicationIdSuffix '.paid'
+            versionNameSuffix '-paid'
+            dimension "mode"
+        }
+
+        pro {
+            applicationId "com.willkernel.app.gradledsl.pro"
+//            applicationIdSuffix '.pro'
+            versionNameSuffix '-pro'
+            dimension "mode"
+        }
+
+        // Configurations in the "api" product flavors override those in "mode"
+        // flavors and the defaultConfig {} block. Gradle determines the priority
+        // between flavor dimensions based on the order in which they appear next
+        // to the flavorDimensions property above--the first dimension has a higher
+        // priority than the second, and so on.
+        minApi24 {
+            dimension "api"
+            minSdkVersion '24'
+            // To ensure the target device receives the version of the app with
+            // the highest compatible API level, assign version codes in increasing
+            // value with API level. To learn more about assigning version codes to
+            // support app updates and uploading to Google Play, read Multiple APK Support
+            versionCode 30000 + android.defaultConfig.versionCode
+            versionNameSuffix "-minApi24"
+        }
+
+        minApi21 {
+            dimension "api"
+            minSdkVersion '21'
+            // To ensure the target device receives the version of the app with
+            // the highest compatible API level, assign version codes in increasing
+            // value with API level. To learn more about assigning version codes to
+            // support app updates and uploading to Google Play, read Multiple APK Support
+            versionCode 20000 + android.defaultConfig.versionCode
+            versionNameSuffix "-minApi21"
+        }
+
+        stark {
+            dimension 'client'
+        }
+
+        wayne {
+            dimension 'client'
+        }
+    }
+    //过滤变体
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+        // To check for a certain build type, use variant.buildType.name == "<buildType>"
+        if (names.contains("minApi24") || names.contains("Jnidebug")) {
+            // Gradle ignores any variants that satisfy the conditions above.
+            setIgnore(true)
+        }
+    }
+
+//    https://developer.android.com/studio/build/build-variants.html
+//    sourceSets {
+//        main {
+//            java.srcDirs = ['main/java']
+//            res.srcDirs = ['main/res']
+////            manifest.srcFile 'src/main/AndroidManifest.xml'
+//        }
+//
+//        androidTest {
+//            setRoot 'src/tests'
+//        }
+//    }
+
+
+    lintOptions {
+        abortOnError false
+        ignoreWarnings true
+//        if abortOnError false will not resolve your problem, you can try this.
+//        checkReleaseBuilds false
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+
+dependencies {
+//    implementation files('libs/a.jar', 'libs/b.jar')
+//    implementation fileTree(dir: 'libs', include:[ '*.jar'])
+//    implementation project(":androidlib")
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation "junit:junit:$rootProject.ext.JUNIT_VERSION"
+    implementation 'com.android.support:multidex:1.0.2'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+//    testRuntimeOnly
+//    runtimeOnly
+//    define your own
+
+//    implementation 'org.codehaus.groovy:groovy-all:2.4.4@jar'
+//    androidTestImplementation('org.spockframework:spock-core:1.0-groovy-2.4') {
+//        exclude group: 'org.codehaus.groovy'
+//        exclude group: 'junit'
+//    }
+}
+
+//A custom task to print available variants
+task printVariantNames() {
+    doLast {
+        android.applicationVariants.all { variant ->
+            println variant.name
+        }
+    }
+}
+
+// get hash of current commit
+//def getGitHash() {
+//    def stdout = new ByteArrayOutputStream()
+//    exec {
+//        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+//        standardOutput = stdout
+//    }
+//
+//    return "-" + stdout.toString().trim()
+//}

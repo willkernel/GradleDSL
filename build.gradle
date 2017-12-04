@@ -1,0 +1,79 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+//        mavenCentral()
+//        maven {
+//            url "http://maven.google.com"
+//        }
+        jcenter()
+        google()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:3.0.1"
+    }
+}
+
+//As you can see, by default the plug-in is downloaded from jcenter, which means the
+//Bintray JCenter Artifactory repository. Other repositories are supported (especially
+//mavenCentral(), the default Maven repository), but JCenter is now the default. All
+//content from JCenter is served over a CDN with a secure HTTPS connection. It also
+//tends to be faster.
+
+//void allprojects(Action<? super Project> action)
+allprojects {
+    repositories {
+//        maven {
+//            url "http://maven.google.com" // Adding a Maven repo from a URL
+//        }
+
+//        mavenLocal()// Local Maven cache  http://repo1.maven.org/maven2
+//        mavenCentral()// Public Maven Central respository
+
+//        Accessing a Maven repo requiring credentials
+//        credentials {
+//            username 'username'
+//            password 'password'
+//        Revised Maven repo with explicit credentials removed
+//              username login
+//              password pass
+//        }
+//        url 'http://repo.mycompany.com/maven2'
+
+//        Using an Ivy repository
+//        ivy {
+//            url 'http://my.ivy.repo'
+//        }
+
+//        Using a local directory as a repository
+//        flatDir {
+//            dirs 'lib'
+//        }
+
+        //https://jcenter.bintray.com.
+        jcenter()
+        google()
+    }
+}
+
+//Upgrading to a Newer Version of Gradle
+//1. gradlew wrapper --gradle-version 4.0
+
+//2. With this change, running the gradlew wrapper task will generate the new wrapper
+//files.
+task wrapper(type: Wrapper) {
+    gradleVersion = 4.1
+}
+
+//If all of your subprojects are Android libraries, you can remove the duplication
+//by applying the plug-in at the top level
+//Using a subprojects block in the top-level build file
+//subprojects {
+//    apply plugin: 'com.android.library'
+//}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+apply from: 'config.gradle'

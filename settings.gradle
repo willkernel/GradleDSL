@@ -1,0 +1,2 @@
+include ':app', ':androidlib', ':javalib'
+//rootProject.buildFileName = 'build.gradle'

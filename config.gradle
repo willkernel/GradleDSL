@@ -1,0 +1,21 @@
+ext {
+    JUNIT_VERSION = '4.12'
+    //these values in gradle.properties
+//    The values can also be set from the command line, which takes top precedence
+//    Running Gradle with properties set from command line
+//    gradlew -Puser=user_from_pflag -Ppass=pass_from_pflag printProperties
+
+//    if (!project.hasProperty('user')) {
+//        user = 'user_from_build_file'
+//    }
+//    if (!project.hasProperty('pass')) {
+//        pass = 'pass_from_build_file'
+//    }
+}
+task printProperties() {
+    doLast {
+        println "username=$user"
+        println "password==$pass"
+    }
+//    execute gradlew printProperties
+}
