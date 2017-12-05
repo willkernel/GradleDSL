@@ -28,9 +28,9 @@ android {
 
     signingConfigs {
         release {
-//            Generating a release key , keytool -help 获取帮助
-//            keytool -genkey -v -keystore app.keystore/app.jks -alias gradle -keyalg RSA -keysize 2048 -validity 10000 (all on one line)
-//            正在为以下对象生成 2,048 位RSA密钥对和自签名证书 (SHA256withRSA) (有效期为 20,000 天)
+            /**  Generating a release key , keytool -help 获取帮助
+             keytool -genkey -v -keystore app.keystore/app.jks -alias gradle -keyalg RSA -keysize 2048 -validity 10000 (all on one line)
+             正在为以下对象生成 2,048 位RSA密钥对和自签名证书 (SHA256withRSA) (有效期为 20,000 天)*/
             keyAlias project.keyAlias
 
             //通过命令行设置see config.gradle
@@ -47,17 +47,17 @@ android {
         }
 
         debug {
-//        shows how to list the default certificate
-//        c:\Users\willkernel\.android> keytool -list -keystore debug.keystore
+            /**   shows how to list the default certificate
+             c:\Users\willkernel\.android> keytool -list -keystore debug.keystore
 
-//        The keystore type is JKS, which stands for (naturally enough) Java KeyStore, used
-//        for public and private keys. Java supports another type called JCEKS (Java Cryptography
-//        Extensions KeyStore), which can be used for shared keys, but isn’t used for
-//        Android applications.
-//        The keystore has a self-signed certificate with an alias of androiddebugkey, which is
-//        used to sign debug APKs when they are deployed to connected devices or emulators.
-//                To reset the debug keystore, simply delete the file debug.keystore. It
-//        will be re-created next time you deploy an app.
+             The keystore type is JKS, which stands for (naturally enough) Java KeyStore, used
+             for public and private keys. Java supports another type called JCEKS (Java Cryptography
+             Extensions KeyStore), which can be used for shared keys, but isn’t used for
+             Android applications.
+             The keystore has a self-signed certificate with an alias of androiddebugkey, which is
+             used to sign debug APKs when they are deployed to connected devices or emulators.
+             To reset the debug keystore, simply delete the file debug.keystore. It
+             will be re-created next time you deploy an app.*/
         }
     }
 
@@ -125,16 +125,16 @@ android {
 
     }
 
-    // Specifies the flavor dimensions you want to use. The order in which you
-    // list each dimension determines its priority, from highest to lowest,
-    // when Gradle merges variant sources and configurations. You must assign
-    // each product flavor you configure to one of the flavor dimensions.
+    /**  Specifies the flavor dimensions you want to use. The order in which you
+     list each dimension determines its priority, from highest to lowest,
+     when Gradle merges variant sources and configurations. You must assign
+     each product flavor you configure to one of the flavor dimensions.*/
     flavorDimensions "mode", "client", "api"
-//    One additional note is necessary here. The flavorDimensions tag in the Gradle build
-//    file listed attitude before client, which means values from the attitude dimension
-//    will have higher priority than the client dimension. Therefore, the hello_world
-//    string resource was removed from each of the attitude flavors. Switching the order of
-//    client and attitude would have worked just as well, of course
+    /**One additional note is necessary here. The flavorDimensions tag in the Gradle build
+     file listed attitude before client, which means values from the attitude dimension
+     will have higher priority than the client dimension. Therefore, the hello_world
+     string resource was removed from each of the attitude flavors. Switching the order of
+     client and attitude would have worked just as well, of course*/
 
 // The priority is: build type overrides Product Flavor,
 // which overrides the main source set.
@@ -160,11 +160,11 @@ android {
             dimension "mode"
         }
 
-        // Configurations in the "api" product flavors override those in "mode"
-        // flavors and the defaultConfig {} block. Gradle determines the priority
-        // between flavor dimensions based on the order in which they appear next
-        // to the flavorDimensions property above--the first dimension has a higher
-        // priority than the second, and so on.
+        /** Configurations in the "api" product flavors override those in "mode"
+         flavors and the defaultConfig {} block. Gradle determines the priority
+         between flavor dimensions based on the order in which they appear next
+         to the flavorDimensions property above--the first dimension has a higher
+         priority than the second, and so on.*/
         minApi24 {
             dimension "api"
             minSdkVersion '24'
@@ -199,7 +199,8 @@ android {
     variantFilter { variant ->
         def names = variant.flavors*.name
         // To check for a certain build type, use variant.buildType.name == "<buildType>"
-        if (names.contains("minApi24") || names.contains("Jnidebug")) {
+        if (names.contains("minApi24") || names.contains("Jnidebug")
+                || names.contains("stark")) {
             // Gradle ignores any variants that satisfy the conditions above.
             setIgnore(true)
         }
@@ -254,11 +255,51 @@ dependencies {
 //    }
 }
 
-//A custom task to print available variants
+/**A custom task to print available variants
+ * The applicationVariants property is only available for the
+ * com.android.application plug-in. A libraryVariants property
+ * is available in Android libraries. A testVariants property
+ * is available in both.
+ */
 task printVariantNames() {
     doLast {
         android.applicationVariants.all { variant ->
             println variant.name
+        }
+    }
+}
+
+/**
+ * The buildDir property refers to the default build directory (app/build),
+ * and the dollar sign is used to inject it into a Groovy string (with double quotes).
+ * The documentation for the Copy task shows that the exclude block inside from supports an Ant-style
+ * directory name, meaning that ** matches all descendent directories.
+ * */
+task copyApks(type: Copy) {
+    from("$buildDir/outputs/apk/paidStarkMinApi21") {
+        exclude '**/*unsigned.apk', '**/*unaligned.apk', '**/*.json'
+        rename 'app', 'willkernel'
+        includeEmptyDirs = false
+    }
+    into "C:\\Users\\willkernel\\Desktop\\output"
+//    into "../apks"
+}
+
+/**In this case, the dependsOn method shows that this is part of the configuration
+ process rather than execution. Each variant name, like friendlyDebug, is capitalized
+ (FriendlyDebug) and then the corresponding installation task (install
+ FriendlyDebug) is added as a dependency to the installDebugFlavors task.
+ The result is during the configuration process, installArrogantDebug, install
+ FriendlyDebug, and installObsequiousDebug are all added as dependencies to
+ installDebugFlavors. Therefore, executing installDebugFlavors at the command
+ line requires all three flavor installs.
+ run command gradlew instDebFl
+ */
+task installDebugFlavors() {
+    android.applicationVariants.all { v ->
+        if (v.name.endsWith('Debug')) {
+            String name = v.name.capitalize()
+            dependsOn "install$name"
         }
     }
 }
