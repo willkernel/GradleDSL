@@ -11,6 +11,7 @@ android {
         versionCode 1
         versionName "1.0.0"
         multiDexEnabled true
+
         // get the git hash in your Java code with BuildConfig.GitHash.
 //        buildConfigField "String", "GitHash", "\"${getGitHash()}\""
 
@@ -219,7 +220,20 @@ android {
 //        }
 //    }
 
+    /**
+     * Extending the ADP Timeout Period Changing the ADB timeout period
+     * This extends the timeout limit to 30 seconds.
+     * Adjust this value if you are getting
+     * ShellCommandUnresponsiveException failures.
+     * */
+    adbOptions {
+        timeOutInMs = 30 * 1000
+    }
 
+    /**
+     * You can set a project property from the command line using the -P flag, as
+     * gradlew build -PnoLint | grep lint
+     */
     lintOptions {
         abortOnError false
         ignoreWarnings true
@@ -274,15 +288,40 @@ task printVariantNames() {
  * and the dollar sign is used to inject it into a Groovy string (with double quotes).
  * The documentation for the Copy task shows that the exclude block inside from supports an Ant-style
  * directory name, meaning that ** matches all descendent directories.
+ *
+ * The dependency on assembleDebug means all the debug APKs will be generated
+ * before the copy task runs. You can use assemble instead
+ * if you want the release APKs as well.
  * */
-task copyApks(type: Copy) {
-    from("$buildDir/outputs/apk/paidStarkMinApi21") {
+task copyApks(type: Copy, dependsOn: "assembleDebug") {
+    from("$buildDir/outputs/apk/freeWayneMinApi21") {
         exclude '**/*unsigned.apk', '**/*unaligned.apk', '**/*.json'
         rename 'app', 'willkernel'
         includeEmptyDirs = false
     }
-    into "C:\\Users\\willkernel\\Desktop\\output"
-//    into "../apks"
+//    into "C:\\Users\\willkernel\\Desktop\\output"
+    into "../apks"
+}
+
+/**Making copyApks a part of the build*/
+build.dependsOn copyApks
+
+/**
+ * When Gradle runs, it assembles a directed acyclic graph, known as a task graph. You
+ can get a reference to it inside your build file through the gradle object. Any manipulation
+ of the graph needs to be done after it has been formed, so you want to use the
+ whenReady property before applying any changes.
+
+ * Disabling all tasks that start with the word lint
+ * The result is that all tasks that have a name that starts with the letters lint have their
+ enabled property set to false, so none of them will run.
+
+ Only disable the lint tasks if the noLint property is set
+ */
+gradle.taskGraph.whenReady { graph ->
+    if (project.hasProperty('noLint')) {
+        graph.allTasks.findAll { it.name ==~ /lint.*/ }*.enabled = false
+    }
 }
 
 /**In this case, the dependsOn method shows that this is part of the configuration

@@ -14,11 +14,11 @@ buildscript {
     }
 }
 
-//As you can see, by default the plug-in is downloaded from jcenter, which means the
-//Bintray JCenter Artifactory repository. Other repositories are supported (especially
-//mavenCentral(), the default Maven repository), but JCenter is now the default. All
-//content from JCenter is served over a CDN with a secure HTTPS connection. It also
-//tends to be faster.
+/**As you can see, by default the plug-in is downloaded from jcenter, which means the
+ Bintray JCenter Artifactory repository. Other repositories are supported (especially
+ mavenCentral(), the default Maven repository), but JCenter is now the default. All
+ content from JCenter is served over a CDN with a secure HTTPS connection. It also
+ tends to be faster.*/
 
 //void allprojects(Action<? super Project> action)
 allprojects {
@@ -56,11 +56,11 @@ allprojects {
     }
 }
 
-//Upgrading to a Newer Version of Gradle
-//1. gradlew wrapper --gradle-version 4.0
+/**Upgrading to a Newer Version of Gradle
+ 1. gradlew wrapper --gradle-version 4.0
 
-//2. With this change, running the gradlew wrapper task will generate the new wrapper
-//files.
+ 2. With this change, running the gradlew wrapper task will generate the new wrapper
+ files.*/
 task wrapper(type: Wrapper) {
     gradleVersion = 4.1
 }
@@ -73,7 +73,7 @@ task wrapper(type: Wrapper) {
 //}
 
 task clean(type: Delete) {
-    delete rootProject.buildDir
+    delete rootProject.buildDir,'apks'
 }
 
 apply from: 'config.gradle'
