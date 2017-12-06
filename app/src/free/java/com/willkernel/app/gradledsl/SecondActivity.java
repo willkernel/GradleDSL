@@ -3,7 +3,6 @@ package com.willkernel.app.gradledsl;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.willkernel.app.gradledsl.R;
 
 public class SecondActivity extends AppCompatActivity {
 

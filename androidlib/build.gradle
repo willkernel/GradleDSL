@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 26
-
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         minSdkVersion 19
@@ -14,11 +14,6 @@ android {
 
     }
 
-    sourceSets {
-        main.java.srcDirs = ['src/java']
-        main.java.srcDirs = ['src/resources']
-    }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -26,13 +21,25 @@ android {
         }
     }
 
+    packagingOptions {
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'LICENSE.txt'
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'com.android.support:appcompat-v7:26.1.0'
-    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    testImplementation "junit:junit:$rootProject.ext.JUNIT_VERSION"
+
+    implementation 'com.android.support:multidex:1.0.2'
+    implementation 'com.google.code.gson:gson:2.8.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 }
