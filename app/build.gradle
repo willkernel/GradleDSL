@@ -376,7 +376,7 @@ build.dependsOn copyApks
  * Disabling all tasks that start with the word lint
  * The result is that all tasks that have a name that starts with the letters lint have their
  enabled property set to false, so none of them will run.
-
+ set property : gradlew build -PnoLint | grep lint
  Only disable the lint tasks if the noLint property is set
  */
 gradle.taskGraph.whenReady { graph ->
